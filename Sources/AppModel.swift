@@ -16,6 +16,8 @@ final class AppModel {
     var swipeGesturesEnabled: Bool = true
     var swipeApps: [GestureTarget] = GestureTarget.defaults()
     var swipeStatus: String?
+    var middleClickEnabled: Bool = true
+    var middleClickStatus: String?
     var finderSyncEnabled: Bool = FinderSyncSettings.isMenuEnabled()
     var finderExtensionEnabledInSystem: Bool = false
     var language: AppLanguage = .system
@@ -30,6 +32,8 @@ final class AppModel {
     @ObservationIgnored
     private let swipes = SwipeGestureMonitor()
     @ObservationIgnored
+    private let middleClick = MiddleClickMonitor()
+    @ObservationIgnored
     private var accessibilityTimer: Timer?
     @ObservationIgnored
     private var finderRevealObserver: NSObjectProtocol?
@@ -38,6 +42,7 @@ final class AppModel {
     private let delayKey = "keyDelayMs"
     private let swipeEnabledKey = "swipeGesturesEnabled"
     private let swipeAppsKey = "swipeApps"
+    private let middleClickKey = "middleClickEnabled"
     private let languageKey = "interfaceLanguage"
     private let openAtLoginKey = "openAtLogin"
 
@@ -65,8 +70,16 @@ final class AppModel {
         swipes.onStatus = { [weak self] text in
             self?.swipeStatus = text
         }
+        middleClick.strings = { [weak self] in
+            self?.t ?? L10n(.en)
+        }
+        middleClick.onStatus = { [weak self] text in
+            self?.middleClickStatus = text
+        }
         updateSwipeMonitor()
+        updateMiddleClickMonitor()
         swipes.start()
+        middleClick.start()
         FinderSyncSettings.setLanguage(language)
         registerFinderExtension()
         refreshFinderExtensionStatus()
@@ -117,6 +130,11 @@ final class AppModel {
         updateSwipeMonitor()
     }
 
+    func persistMiddleClick() {
+        persist()
+        updateMiddleClickMonitor()
+    }
+
     func persistText() {
         persist()
     }
@@ -124,6 +142,15 @@ final class AppModel {
     func testSwipe(_ leftToRight: Bool) {
         swipeStatus = t.testSendingLeft(leftToRight)
         NavigationShortcut.postBracket(leftToRight: leftToRight)
+    }
+
+    func testMiddleClick() {
+        middleClickStatus = t.testMiddleClickSoon
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) { [weak self] in
+            guard let self else { return }
+            MiddleClickPoster.postAtCursor()
+            self.middleClickStatus = self.t.middleClickTestSent
+        }
     }
 
     func pickSwipeApp() {
@@ -266,6 +293,7 @@ final class AppModel {
     private func updateHotkeySuppression() {
         hotkeys.suppressEvents = isRecordingHotkey || isTyping
         swipes.isSuppressed = isRecordingHotkey || isTyping
+        middleClick.isSuppressed = isRecordingHotkey || isTyping
     }
 
     private func applyHotkeyReload(_ result: HotkeyReloadResult) {
@@ -295,6 +323,9 @@ final class AppModel {
         if UserDefaults.standard.object(forKey: openAtLoginKey) != nil {
             openAtLogin = UserDefaults.standard.bool(forKey: openAtLoginKey)
         }
+        if UserDefaults.standard.object(forKey: middleClickKey) != nil {
+            middleClickEnabled = UserDefaults.standard.bool(forKey: middleClickKey)
+        }
     }
 
     private func ensureClipboardSnippet() {
@@ -320,6 +351,7 @@ final class AppModel {
         }
         UserDefaults.standard.set(language.rawValue, forKey: languageKey)
         UserDefaults.standard.set(openAtLogin, forKey: openAtLoginKey)
+        UserDefaults.standard.set(middleClickEnabled, forKey: middleClickKey)
     }
 
     private func applyOpenAtLogin() {
@@ -376,6 +408,10 @@ final class AppModel {
 
     private func updateSwipeMonitor() {
         swipes.update(enabled: swipeGesturesEnabled, targets: swipeApps)
+    }
+
+    private func updateMiddleClickMonitor() {
+        middleClick.update(enabled: middleClickEnabled)
     }
 
     private func listenForFinderReveal() {

@@ -3,6 +3,7 @@ import SwiftUI
 enum SidebarItem: Hashable {
     case snippet(UUID)
     case swipes
+    case middleClick
     case finder
 }
 
@@ -36,6 +37,8 @@ struct SettingsView: View {
                     }
                 case .swipes:
                     GestureSettingsView(model: model)
+                case .middleClick:
+                    MiddleClickSettingsView(model: model)
                 case .finder:
                     FinderSettingsView(model: model)
                 case nil:
@@ -58,6 +61,7 @@ struct SettingsView: View {
         .onChange(of: model.snippets.map(\.id)) { _, ids in
             if case .snippet(let id) = selection, ids.contains(id) { return }
             if case .swipes = selection { return }
+            if case .middleClick = selection { return }
             if case .finder = selection { return }
             selection = ids.first.map { .snippet($0) } ?? .swipes
         }
@@ -113,6 +117,8 @@ struct SettingsView: View {
             Section(model.t.gesturesSection) {
                 Label(model.t.twoFingerSwipe, systemImage: "hand.draw")
                     .tag(SidebarItem.swipes)
+                Label(model.t.threeFingerClick, systemImage: "hand.tap")
+                    .tag(SidebarItem.middleClick)
             }
 
             Section(model.t.finderSection) {

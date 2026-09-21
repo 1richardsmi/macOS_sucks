@@ -80,6 +80,7 @@ struct L10n {
     var gesturesSection: String { t("Жесты", "Gestures") }
     var finderSection: String { "Finder" }
     var twoFingerSwipe: String { t("Свайп двумя пальцами", "Two-finger swipe") }
+    var threeFingerClick: String { t("Нажатие тремя пальцами", "Three-finger click") }
     var newTextFile: String { t("Новый текстовый файл", "New text file") }
     var addSnippetHelp: String { t("Добавить макрос", "Add macro") }
     var removeSnippetHelp: String { t("Удалить макрос", "Delete macro") }
@@ -269,6 +270,42 @@ struct L10n {
     func swipeLeft(in name: String) -> String {
         t("Свайп влево → ⌘[ в \(name)", "Swipe left → ⌘[ in \(name)")
     }
+    var enableMiddleClick: String { t("Три пальца = средняя кнопка мыши", "Three fingers = middle mouse button") }
+    var middleClickHint: String {
+        t(
+            "Обычное нажатие тремя пальцами, не Force Click. Жест уходит во все приложения. Имеет смысл в Chrome и Firefox: ссылка откроется во вкладке, вкладка закроется. Safari среднюю кнопку часто игнорирует. Look Up на сильном нажатии одним пальцем не трогаем.",
+            "A normal three-finger press, not a Force Click. The click is sent to every app. It is useful in Chrome and Firefox: a link opens in a new tab, a tab closes. Safari often ignores the middle button. Look Up on a one-finger Force Click is left alone."
+        )
+    }
+    var middleClickHowTo: String {
+        t(
+            "Поставь три пальца на трекпад и нажми, как обычный клик — не давить сильнее. Проверь на ссылке в Chrome. Если ничего не происходит, выдайте ещё и «Мониторинг входных данных».",
+            "Put three fingers on the trackpad and click normally — do not press harder. Try it on a Chrome link. If nothing happens, also grant Input Monitoring."
+        )
+    }
+    var testMiddleClick: String { t("Проверить среднюю кнопку", "Test middle click") }
+    var testMiddleClickSoon: String {
+        t(
+            "Средняя кнопка через секунду — наведи курсор на ссылку.",
+            "Middle click in a second — hover a link."
+        )
+    }
+    var middleClickTestSent: String { t("Отправил клик средней кнопки.", "Sent a middle click.") }
+    var middleClickFired: String { t("Три пальца → средняя кнопка.", "Three fingers → middle click.") }
+    var middleClickListening: String { t("Трёхпальцевый клик слушает трекпад.", "Three-finger click is listening to the trackpad.") }
+    var middleClickFailed: String {
+        t(
+            "Не удалось перехватить клик трекпада. Нужны Универсальный доступ и Мониторинг входных данных.",
+            "Could not intercept the trackpad click. Accessibility and Input Monitoring are required."
+        )
+    }
+    var middleClickNoTrackpad: String {
+        t(
+            "Трекпад не найден. Жест средней кнопки не запустится.",
+            "No trackpad found. The middle-click gesture will not start."
+        )
+    }
+
     var tapEnabled: String { t("Перехват трекпада включён.", "Trackpad tap is on.") }
     var tapFallback: String { t("Event tap не создался, использую запасной слушатель.", "Event tap failed, using the fallback listener.") }
 

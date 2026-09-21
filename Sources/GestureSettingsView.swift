@@ -72,3 +72,37 @@ struct GestureSettingsView: View {
         .navigationTitle("macOS_sucks")
     }
 }
+
+struct MiddleClickSettingsView: View {
+    @Bindable var model: AppModel
+
+    var body: some View {
+        Form {
+            Section(model.t.threeFingerClick) {
+                Toggle(model.t.enableMiddleClick, isOn: $model.middleClickEnabled)
+                    .onChange(of: model.middleClickEnabled) { _, _ in
+                        model.persistMiddleClick()
+                    }
+                Text(model.t.middleClickHint)
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                if let status = model.middleClickStatus {
+                    Text(status)
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                }
+                Button(model.t.testMiddleClick) {
+                    model.testMiddleClick()
+                }
+                Text(model.t.middleClickHowTo)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .formStyle(.grouped)
+        .padding(8)
+        .navigationTitle("macOS_sucks")
+    }
+}
