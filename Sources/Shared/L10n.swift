@@ -40,6 +40,14 @@ struct L10n {
     var languageSystem: String { t("Как в системе", "System") }
     var languageRussian: String { "Русский" }
     var languageEnglish: String { "English" }
+    var startupSection: String { t("Запуск", "Startup") }
+    var openAtLogin: String { t("Открывать при входе в систему", "Open at login") }
+    var loginItemFailed: String {
+        t(
+            "Не удалось добавить macOS_sucks в объекты входа. Проверь Системные настройки → Основные → Объекты входа.",
+            "Could not add macOS_sucks to login items. Check System Settings → General → Login Items."
+        )
+    }
 
     var settings: String { t("Настройки…", "Settings…") }
     var quit: String { t("Выйти", "Quit") }
@@ -48,6 +56,25 @@ struct L10n {
     var noHotkey: String { t("без сочетания", "no shortcut") }
     var disabledShort: String { t("выкл", "off") }
     var newSnippet: String { t("Новый макрос", "New macro") }
+    var clipboardSnippet: String { t("Буфер обмена", "Clipboard") }
+    var clipboardHint: String {
+        t(
+            "По сочетанию набирается текст из буфера обмена — теми же нажатиями клавиш, не через ⌘V. Если в буфере картинка, файл или пусто, макрос ничего не делает.",
+            "The shortcut types whatever text is on the clipboard as keystrokes, not ⌘V. If the clipboard holds an image, a file, or nothing, the macro does nothing."
+        )
+    }
+    var howToClipboard2: String {
+        t(
+            "2. Нажмите «Записать» и назначьте сочетание.",
+            "2. Click “Record” and assign a shortcut."
+        )
+    }
+    var howToClipboard3: String {
+        t(
+            "3. Скопируйте текст, кликните в нужное поле, нажмите сочетание и отпустите клавиши.",
+            "3. Copy text, click the target field, press the shortcut, and release the keys."
+        )
+    }
 
     var macrosSection: String { t("Макросы", "Macros") }
     var gesturesSection: String { t("Жесты", "Gestures") }

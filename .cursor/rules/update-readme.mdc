@@ -1,0 +1,17 @@
+---
+description: Keep both READMEs in sync with app behavior
+alwaysApply: true
+---
+
+# Update README with the product
+
+When you add a feature or change existing behavior, update **both** `README.md` (English) and `README.ru.md` (Russian) in the same change.
+
+Cover:
+
+- the short intro list of what the app is
+- **What it does** / **Что умеет**
+- **How to use** / **Как пользоваться** if the user-facing steps changed
+- install, permissions, or language notes if those changed
+
+Do not leave the READMEs describing the previous version.

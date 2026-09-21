@@ -3,12 +3,19 @@ import Carbon
 import Foundation
 
 struct Snippet: Identifiable, Codable, Equatable, Hashable {
+    static let clipboardID = UUID(uuidString: "3f8c1a2b-6d4e-4a91-9c0f-7b2e5d8a1c44")!
+
     var id: UUID
     var title: String
     var text: String
     var keyCode: UInt32?
     var carbonModifiers: UInt32
     var enabled: Bool
+    var usesClipboard: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case id, title, text, keyCode, carbonModifiers, enabled, usesClipboard
+    }
 
     init(
         id: UUID = UUID(),
@@ -16,7 +23,8 @@ struct Snippet: Identifiable, Codable, Equatable, Hashable {
         text: String = "",
         keyCode: UInt32? = nil,
         carbonModifiers: UInt32 = 0,
-        enabled: Bool = true
+        enabled: Bool = true,
+        usesClipboard: Bool = false
     ) {
         self.id = id
         self.title = title
@@ -24,6 +32,22 @@ struct Snippet: Identifiable, Codable, Equatable, Hashable {
         self.keyCode = keyCode
         self.carbonModifiers = carbonModifiers
         self.enabled = enabled
+        self.usesClipboard = usesClipboard
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        title = try container.decode(String.self, forKey: .title)
+        text = try container.decode(String.self, forKey: .text)
+        keyCode = try container.decodeIfPresent(UInt32.self, forKey: .keyCode)
+        carbonModifiers = try container.decode(UInt32.self, forKey: .carbonModifiers)
+        enabled = try container.decode(Bool.self, forKey: .enabled)
+        usesClipboard = try container.decodeIfPresent(Bool.self, forKey: .usesClipboard) ?? false
+    }
+
+    static func clipboardDefault(title: String) -> Snippet {
+        Snippet(id: clipboardID, title: title, usesClipboard: true)
     }
 
     var hasHotkey: Bool { keyCode != nil }

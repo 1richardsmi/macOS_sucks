@@ -1,4 +1,5 @@
 import AppKit
+import Carbon
 import SwiftUI
 
 @main
@@ -26,9 +27,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.regular)
         model.startAfterLaunch()
-        DispatchQueue.main.async { [weak self] in
-            self?.showSettings()
+        if !Self.launchedAsLoginItem() {
+            DispatchQueue.main.async { [weak self] in
+                self?.showSettings()
+            }
         }
+    }
+
+    private static func launchedAsLoginItem() -> Bool {
+        guard let event = NSAppleEventManager.shared().currentAppleEvent else { return false }
+        guard event.eventID == AEEventID(kAEOpenApplication) else { return false }
+        return event.paramDescriptor(forKeyword: AEKeyword(keyAELaunchedAsLogInItem)) != nil
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
@@ -88,7 +97,7 @@ struct MenuBarView: View {
                         Text(snippet.title)
                     }
                 }
-                .disabled(!snippet.enabled || snippet.text.isEmpty)
+                .disabled(!snippet.enabled || (!snippet.usesClipboard && snippet.text.isEmpty))
             }
         }
         Divider()

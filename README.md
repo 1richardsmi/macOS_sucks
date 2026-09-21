@@ -16,18 +16,20 @@ This app exists because “it just works” cannot type real keystrokes into Hor
 
 ---
 
-A menu-bar utility: text macros on a global hotkey, two-finger swipes, and a Finder **New Text Document** item — including a right-click on empty space.
+A menu-bar utility: text macros on a global hotkey, type-the-clipboard as keystrokes, two-finger swipes, and a Finder **New Text Document** item — including a right-click on empty space.
 
 The macro is typed as real key down/up events, not ⌘V. That is how it reaches Omnissa Horizon Client. Yes, in 2026 a Mac needs a separate app for that. We are shocked too.
 
-The interface can be **Russian or English**. In the app sidebar, under Language, pick System, Русский, or English.
+The interface can be **Russian or English**. In the app sidebar, under Language, pick System, Русский, or English. It opens at login by default; turn that off under **Startup** if you want.
 
 ## What it does
 
 - Global macros: record a shortcut, and prepared text is typed into any field.
+- Built-in **Clipboard** macro: the shortcut types the current clipboard as keystrokes, not ⌘V. If the clipboard is an image, a file, or empty, nothing happens. The item cannot be deleted, only turned off.
 - If the layout is Russian and the text has Latin letters, the layout is switched to English for the duration and then restored. macOS itself, of course, never thought of this.
 - Two-finger swipe left/right in selected apps (Finder and System Settings by default) = ⌘] / ⌘[.
 - In Finder’s context menu: **New Text Document**. On a folder it expands in the same window and the file appears inside. Windows could do this while Jobs still wore a turtleneck.
+- Starts at login after a reboot. The toggle is **Startup → Open at login**. A login launch stays in the menu bar and does not pop the settings window.
 
 ## Requirements
 
@@ -38,7 +40,7 @@ The interface can be **Russian or English**. In the app sidebar, under Language,
 
 No Xcode. No `make`. Just the zip from [Releases](https://github.com/1richardsmi/macOS_sucks/releases/latest).
 
-1. Download `macOS_sucks-1.0-arm64.zip`.
+1. Download `macOS_sucks-1.1-arm64.zip`.
 2. Unzip it.
 3. Drag `macOS_sucks.app` into `~/Applications` (or `/Applications`).
 4. Right-click the app → **Open**. Gatekeeper will complain: the signature is homemade, not from the App Store. Click **Open** anyway. A double-click is often not enough the first time.
@@ -100,8 +102,10 @@ macOS will not send keys or gestures without a checkbox pilgrimage. This is not 
 
 1. Add a macro, enter text, click **Record**, then press the shortcut (Control+Option+key is better than Command+Option).
 2. Click the target field, press the shortcut, and release the keys. Typing starts only after modifiers are up.
-3. Swipes: in **Two-finger swipe** keep Finder / Settings or add other apps.
-4. Finder: right-click empty space or a folder → **New Text Document**.
+3. **Clipboard**: assign a shortcut to the built-in Clipboard macro, copy text, then press it in the target field. Same keystroke typing as a regular macro.
+4. Swipes: in **Two-finger swipe** keep Finder / Settings or add other apps.
+5. Finder: right-click empty space or a folder → **New Text Document**.
+6. After a reboot the app should already be in the menu bar. If macOS asks about a new login item, allow it. To stop that: uncheck **Open at login**.
 
 ## Manual build
 

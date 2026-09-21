@@ -89,7 +89,7 @@ struct SettingsView: View {
                 } else {
                     ForEach(model.snippets) { snippet in
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(snippet.title.isEmpty ? model.t.untitledSnippet : snippet.title)
+                            Text(snippet.title.isEmpty ? (snippet.usesClipboard ? model.t.clipboardSnippet : model.t.untitledSnippet) : snippet.title)
                                 .font(.headline)
                                 .lineLimit(1)
                             HStack {
@@ -118,6 +118,13 @@ struct SettingsView: View {
             Section(model.t.finderSection) {
                 Label(model.t.newTextFile, systemImage: "doc.badge.plus")
                     .tag(SidebarItem.finder)
+            }
+
+            Section(model.t.startupSection) {
+                Toggle(model.t.openAtLogin, isOn: $model.openAtLogin)
+                    .onChange(of: model.openAtLogin) { _, _ in
+                        model.persistOpenAtLogin()
+                    }
             }
 
             Section(model.t.languageSection) {
@@ -150,7 +157,7 @@ struct SettingsView: View {
                 } label: {
                     Image(systemName: "minus")
                 }
-                .disabled(!isSnippetSelected)
+                .disabled(!canDeleteSelectedSnippet)
                 .help(model.t.removeSnippetHelp)
             }
         }
@@ -242,6 +249,15 @@ struct SettingsView: View {
         return false
     }
 
+    private var canDeleteSelectedSnippet: Bool {
+        guard case .snippet(let id) = selection,
+              let snippet = model.snippets.first(where: { $0.id == id })
+        else {
+            return false
+        }
+        return !snippet.usesClipboard
+    }
+
     private func snippetBinding(_ id: UUID) -> Binding<Snippet>? {
         guard let index = model.snippets.firstIndex(where: { $0.id == id }) else { return nil }
         return $model.snippets[index]
@@ -261,8 +277,13 @@ struct SnippetEditor: View {
             Section(model.t.howToUse) {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(model.t.howTo1)
-                    Text(model.t.howTo2)
-                    Text(model.t.howTo3)
+                    if snippet.usesClipboard {
+                        Text(model.t.howToClipboard2)
+                        Text(model.t.howToClipboard3)
+                    } else {
+                        Text(model.t.howTo2)
+                        Text(model.t.howTo3)
+                    }
                     Text(model.t.howTo4)
                 }
                 .font(.callout)
@@ -281,17 +302,24 @@ struct SnippetEditor: View {
             }
 
             Section(model.t.textSection) {
-                Text(model.t.textHint)
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
+                if snippet.usesClipboard {
+                    Text(model.t.clipboardHint)
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                } else {
+                    Text(model.t.textHint)
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
 
-                TextEditor(text: $snippet.text)
-                    .font(.system(.body, design: .monospaced))
-                    .frame(minHeight: 180)
-                    .onChange(of: snippet.text) { _, _ in
-                        model.persistText()
-                    }
+                    TextEditor(text: $snippet.text)
+                        .font(.system(.body, design: .monospaced))
+                        .frame(minHeight: 180)
+                        .onChange(of: snippet.text) { _, _ in
+                            model.persistText()
+                        }
+                }
             }
 
             Section(model.t.shortcutSection) {
@@ -381,10 +409,12 @@ struct SnippetEditor: View {
     }
 
     private func startCountdown() {
-        let trimmed = snippet.text.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else {
-            model.statusMessage = model.t.enterMacroText
-            return
+        if !snippet.usesClipboard {
+            let trimmed = snippet.text.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !trimmed.isEmpty else {
+                model.statusMessage = model.t.enterMacroText
+                return
+            }
         }
         guard model.isAccessibilityTrusted else {
             model.statusMessage = model.t.grantAccessToTest
@@ -401,7 +431,11 @@ struct SnippetEditor: View {
             guard let value = countdown else { return }
             if value <= 1 {
                 countdown = nil
-                model.runText(snippet.text)
+                if snippet.usesClipboard {
+                    model.runSnippet(id: snippet.id)
+                } else {
+                    model.runText(snippet.text)
+                }
             } else {
                 countdown = value - 1
                 scheduleTick()

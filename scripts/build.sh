@@ -33,7 +33,8 @@ swiftc \
   -framework ApplicationServices \
   -framework CoreGraphics \
   -framework Combine \
-  -framework FinderSync
+  -framework FinderSync \
+  -framework ServiceManagement
 
 swiftc \
   -parse-as-library \

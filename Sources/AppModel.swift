@@ -19,6 +19,7 @@ final class AppModel {
     var finderSyncEnabled: Bool = FinderSyncSettings.isMenuEnabled()
     var finderExtensionEnabledInSystem: Bool = false
     var language: AppLanguage = .system
+    var openAtLogin: Bool = true
 
     var t: L10n { L10n(language.resolved) }
 
@@ -38,6 +39,7 @@ final class AppModel {
     private let swipeEnabledKey = "swipeGesturesEnabled"
     private let swipeAppsKey = "swipeApps"
     private let languageKey = "interfaceLanguage"
+    private let openAtLoginKey = "openAtLogin"
 
     init() {
         load()
@@ -69,8 +71,14 @@ final class AppModel {
         registerFinderExtension()
         refreshFinderExtensionStatus()
         listenForFinderReveal()
+        applyOpenAtLogin()
         startAccessibilityPolling()
         refreshAccessibility()
+    }
+
+    func persistOpenAtLogin() {
+        persist()
+        applyOpenAtLogin()
     }
 
     func persistFinderSync() {
@@ -100,7 +108,7 @@ final class AppModel {
     }
 
     func removeSnippet(id: UUID) {
-        snippets.removeAll { $0.id == id }
+        snippets.removeAll { $0.id == id && !$0.usesClipboard }
         persistAndReloadHotkeys()
     }
 
@@ -167,14 +175,21 @@ final class AppModel {
 
     func runSnippet(id: UUID) {
         guard let snippet = snippets.first(where: { $0.id == id }) else { return }
+        if snippet.usesClipboard {
+            guard let text = Self.plainTextFromClipboard() else { return }
+            runText(text, fromHotkey: true, requireNonEmpty: false)
+            return
+        }
         runText(snippet.text, fromHotkey: true)
     }
 
-    func runText(_ text: String, fromHotkey: Bool = false) {
+    func runText(_ text: String, fromHotkey: Bool = false, requireNonEmpty: Bool = true) {
         refreshAccessibility()
-        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else {
-            statusMessage = t.enterMacroText
+        let payload = requireNonEmpty ? text.trimmingCharacters(in: .whitespacesAndNewlines) : text
+        guard !payload.isEmpty else {
+            if requireNonEmpty {
+                statusMessage = t.enterMacroText
+            }
             return
         }
         guard isAccessibilityTrusted else {
@@ -189,7 +204,7 @@ final class AppModel {
         statusMessage = fromHotkey ? t.firingMacro : t.typingText
         isTyping = true
         updateHotkeySuppression()
-        typer.typeAsync(text, delayMs: keyDelayMs) { [weak self] error in
+        typer.typeAsync(payload, delayMs: keyDelayMs) { [weak self] error in
             guard let self else { return }
             self.isTyping = false
             self.updateHotkeySuppression()
@@ -259,10 +274,15 @@ final class AppModel {
     }
 
     private func load() {
+        if let stored = UserDefaults.standard.string(forKey: languageKey),
+           let parsed = AppLanguage(rawValue: stored) {
+            language = parsed
+        }
         if let data = UserDefaults.standard.data(forKey: snippetsKey),
            let decoded = try? JSONDecoder().decode([Snippet].self, from: data) {
             snippets = decoded
         }
+        ensureClipboardSnippet()
         let storedDelay = UserDefaults.standard.integer(forKey: delayKey)
         keyDelayMs = storedDelay == 0 ? 30 : storedDelay
         if UserDefaults.standard.object(forKey: swipeEnabledKey) != nil {
@@ -272,10 +292,21 @@ final class AppModel {
            let decoded = try? JSONDecoder().decode([GestureTarget].self, from: data) {
             swipeApps = mergeSwipeApps(saved: decoded)
         }
-        if let stored = UserDefaults.standard.string(forKey: languageKey),
-           let parsed = AppLanguage(rawValue: stored) {
-            language = parsed
+        if UserDefaults.standard.object(forKey: openAtLoginKey) != nil {
+            openAtLogin = UserDefaults.standard.bool(forKey: openAtLoginKey)
         }
+    }
+
+    private func ensureClipboardSnippet() {
+        if snippets.contains(where: \.usesClipboard) { return }
+        snippets.insert(Snippet.clipboardDefault(title: t.clipboardSnippet), at: 0)
+    }
+
+    private static func plainTextFromClipboard() -> String? {
+        let board = NSPasteboard.general
+        guard board.availableType(from: [.string]) != nil else { return nil }
+        guard let text = board.string(forType: .string), !text.isEmpty else { return nil }
+        return text
     }
 
     private func persist() {
@@ -288,6 +319,19 @@ final class AppModel {
             UserDefaults.standard.set(data, forKey: swipeAppsKey)
         }
         UserDefaults.standard.set(language.rawValue, forKey: languageKey)
+        UserDefaults.standard.set(openAtLogin, forKey: openAtLoginKey)
+    }
+
+    private func applyOpenAtLogin() {
+        do {
+            try LoginLaunch.setEnabled(openAtLogin)
+            if openAtLogin, !LoginLaunch.isEnabled {
+                statusMessage = t.loginItemFailed
+            }
+        } catch {
+            openAtLogin = LoginLaunch.isEnabled
+            statusMessage = t.loginItemFailed
+        }
     }
 
     private func addSwipeApp(url: URL) {
