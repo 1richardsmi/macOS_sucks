@@ -1,0 +1,7 @@
+dist/
+.certs/
+.build/
+DerivedData/
+.DS_Store
+*.xcuserstate
+xcuserdata/
