@@ -32,22 +32,34 @@ The interface can be **Russian or English**. In the app sidebar, under Language,
 ## Requirements
 
 - macOS 14 or later
-- Apple Silicon (`arm64` build)
-- [Xcode Command Line Tools](https://developer.apple.com/download/all/?q=command%20line%20tools)
+- Apple Silicon (`arm64`)
 
-Check the tools:
+## Install the ready build
+
+No Xcode. No `make`. Just the zip from [Releases](https://github.com/1richardsmi/macOS_sucks/releases/latest).
+
+1. Download `macOS_sucks-1.0-arm64.zip`.
+2. Unzip it.
+3. Drag `macOS_sucks.app` into `~/Applications` (or `/Applications`).
+4. Right-click the app → **Open**. Gatekeeper will complain: the signature is homemade, not from the App Store. Click **Open** anyway. A double-click is often not enough the first time.
+5. Then do the permission dance below.
+
+If macOS still refuses, in Terminal:
 
 ```bash
-xcode-select -p
+xattr -cr ~/Applications/macOS_sucks.app
 ```
 
-If that command is missing:
-
-```bash
-xcode-select --install
-```
+Then right-click → Open again.
 
 ## Install from source
+
+You also need [Xcode Command Line Tools](https://developer.apple.com/download/all/?q=command%20line%20tools).
+
+```bash
+xcode-select -p || xcode-select --install
+```
+
 
 ```bash
 git clone https://github.com/1richardsmi/macOS_sucks.git
@@ -69,7 +81,7 @@ Signing uses a local self-signed certificate (files under `.certs/`, not in git)
 
 ## First launch: permissions
 
-macOS will not send keys or gestures without a checkbox pilgrimage. This is not a bug, it is “privacy”: the system does not trust an app you just built from source on your own disk.
+macOS will not send keys or gestures without a checkbox pilgrimage. This is not a bug, it is “privacy”: the system does not trust an app you just downloaded or built yourself.
 
 1. **Accessibility**  
    System Settings → Privacy & Security → Accessibility → enable `macOS_sucks`.  

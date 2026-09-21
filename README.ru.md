@@ -32,22 +32,34 @@ macOS-юзеры кивают: «зато экосистема». Экосист
 ## Требования
 
 - macOS 14 или новее
-- Apple Silicon (сборка `arm64`)
-- [Xcode Command Line Tools](https://developer.apple.com/download/all/?q=command%20line%20tools)
+- Apple Silicon (`arm64`)
 
-Проверить инструменты:
+## Установка готовой сборки
+
+Без Xcode и без `make`. Просто zip из [Releases](https://github.com/1richardsmi/macOS_sucks/releases/latest).
+
+1. Скачай `macOS_sucks-1.0-arm64.zip`.
+2. Распакуй.
+3. Перетащи `macOS_sucks.app` в `~/Applications` (или `/Applications`).
+4. Правый клик по приложению → **Открыть**. Gatekeeper возмутится: подпись самодельная, не из App Store. Жми **Открыть** всё равно. Обычного двойного клика в первый раз часто мало.
+5. Дальше — паломничество по галочкам ниже.
+
+Если macOS всё равно не пускает, в Терминале:
 
 ```bash
-xcode-select -p
+xattr -cr ~/Applications/macOS_sucks.app
 ```
 
-Если команды нет:
-
-```bash
-xcode-select --install
-```
+Потом снова правый клик → Открыть.
 
 ## Установка из исходников
+
+Ещё понадобятся [Xcode Command Line Tools](https://developer.apple.com/download/all/?q=command%20line%20tools).
+
+```bash
+xcode-select -p || xcode-select --install
+```
+
 
 ```bash
 git clone https://github.com/1richardsmi/macOS_sucks.git
@@ -69,7 +81,7 @@ make run
 
 ## Первый запуск: разрешения
 
-macOS не даёт слать клавиши и жесты без паломничества по чекбоксам. Это не баг, это «конфиденциальность»: система не доверяет программе, которую ты только что сам собрал из исходников у себя на диске.
+macOS не даёт слать клавиши и жесты без паломничества по чекбоксам. Это не баг, это «конфиденциальность»: система не доверяет программе, которую ты только что скачал или собрал сам.
 
 1. **Универсальный доступ**  
    Системные настройки → Конфиденциальность и безопасность → Универсальный доступ → включи `macOS_sucks`.  
