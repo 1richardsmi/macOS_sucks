@@ -43,3 +43,29 @@ struct FinderSettingsView: View {
         }
     }
 }
+
+struct FinderPathSettingsView: View {
+    @Bindable var model: AppModel
+
+    var body: some View {
+        Form {
+            Section(model.t.finderPathSection) {
+                Toggle(model.t.openTerminalToggle, isOn: $model.finderOpenTerminalEnabled)
+                    .onChange(of: model.finderOpenTerminalEnabled) { _, _ in
+                        model.persistFinderFolderActions()
+                    }
+                Toggle(model.t.copyPathToggle, isOn: $model.finderCopyPathEnabled)
+                    .onChange(of: model.finderCopyPathEnabled) { _, _ in
+                        model.persistFinderFolderActions()
+                    }
+                Text(model.t.finderPathHint)
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .formStyle(.grouped)
+        .padding(8)
+        .navigationTitle("macOS_sucks")
+    }
+}

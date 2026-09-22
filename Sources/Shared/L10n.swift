@@ -82,6 +82,7 @@ struct L10n {
     var twoFingerSwipe: String { t("Свайп двумя пальцами", "Two-finger swipe") }
     var threeFingerClick: String { t("Нажатие тремя пальцами", "Three-finger click") }
     var newTextFile: String { t("Новый текстовый файл", "New text file") }
+    var finderPathSection: String { t("Путь и терминал", "Path and Terminal") }
     var addSnippetHelp: String { t("Добавить макрос", "Add macro") }
     var removeSnippetHelp: String { t("Удалить макрос", "Delete macro") }
 
@@ -258,6 +259,16 @@ struct L10n {
     var checkStatus: String { t("Проверить статус", "Check status") }
 
     var finderMenuItem: String { t("Создать текстовый документ", "New Text Document") }
+    var openTerminalHere: String { t("Открыть терминал здесь", "Open Terminal Here") }
+    var copyFolderPath: String { t("Скопировать путь", "Copy Path") }
+    var openTerminalToggle: String { t("Пункт «Открыть терминал здесь»", "“Open Terminal Here” item") }
+    var copyPathToggle: String { t("Пункт «Скопировать путь»", "“Copy Path” item") }
+    var finderPathHint: String {
+        t(
+            "Пункты появляются по правому клику на пустом месте и на файле или папке. «Открыть терминал здесь» открывает Terminal в этой папке или в выделенной папке. «Скопировать путь» кладёт POSIX-путь в буфер. Нужно то же расширение Finder, что и для нового текстового файла.",
+            "The items appear on a right-click in empty Finder space and on a file or folder. “Open Terminal Here” opens Terminal in that folder or in the selected folder. “Copy Path” puts the POSIX path on the clipboard. Uses the same Finder extension as New Text Document."
+        )
+    }
     var newDocumentName: String { t("Новый документ", "New Document") }
 
     var gesturesListening: String { t("Жесты слушают трекпад.", "Gestures are listening to the trackpad.") }

@@ -13,6 +13,14 @@ enum FinderSyncSettings {
         (readObject()["enabled"] as? Bool) ?? true
     }
 
+    static func isOpenTerminalEnabled() -> Bool {
+        (readObject()["openTerminal"] as? Bool) ?? true
+    }
+
+    static func isCopyPathEnabled() -> Bool {
+        (readObject()["copyPath"] as? Bool) ?? true
+    }
+
     static func resolvedLanguage() -> ResolvedLanguage {
         switch readObject()["language"] as? String {
         case "ru":
@@ -25,11 +33,19 @@ enum FinderSyncSettings {
     }
 
     static func setMenuEnabled(_ enabled: Bool) {
-        write(enabled: enabled, language: nil)
+        write(["enabled": enabled])
+    }
+
+    static func setOpenTerminalEnabled(_ enabled: Bool) {
+        write(["openTerminal": enabled])
+    }
+
+    static func setCopyPathEnabled(_ enabled: Bool) {
+        write(["copyPath": enabled])
     }
 
     static func setLanguage(_ language: AppLanguage) {
-        write(enabled: nil, language: language.rawValue)
+        write(["language": language.rawValue])
     }
 
     static func requestReveal(file: URL, folder: URL, expandFolder: Bool) {
@@ -75,16 +91,19 @@ enum FinderSyncSettings {
         return object
     }
 
-    private static func write(enabled: Bool?, language: String?) {
+    private static func write(_ updates: [String: Any]) {
         var object = readObject()
-        if let enabled {
-            object["enabled"] = enabled
-        }
-        if let language {
-            object["language"] = language
+        for (key, value) in updates {
+            object[key] = value
         }
         if object["enabled"] == nil {
             object["enabled"] = true
+        }
+        if object["openTerminal"] == nil {
+            object["openTerminal"] = true
+        }
+        if object["copyPath"] == nil {
+            object["copyPath"] = true
         }
         let directory = settingsURL.deletingLastPathComponent()
         try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)

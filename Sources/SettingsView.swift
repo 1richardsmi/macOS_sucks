@@ -5,6 +5,7 @@ enum SidebarItem: Hashable {
     case swipes
     case middleClick
     case finder
+    case finderPath
 }
 
 struct SettingsView: View {
@@ -41,6 +42,8 @@ struct SettingsView: View {
                     MiddleClickSettingsView(model: model)
                 case .finder:
                     FinderSettingsView(model: model)
+                case .finderPath:
+                    FinderPathSettingsView(model: model)
                 case nil:
                     ContentUnavailableView(
                         model.t.chooseSection,
@@ -63,6 +66,7 @@ struct SettingsView: View {
             if case .swipes = selection { return }
             if case .middleClick = selection { return }
             if case .finder = selection { return }
+            if case .finderPath = selection { return }
             selection = ids.first.map { .snippet($0) } ?? .swipes
         }
         .overlay {
@@ -124,6 +128,8 @@ struct SettingsView: View {
             Section(model.t.finderSection) {
                 Label(model.t.newTextFile, systemImage: "doc.badge.plus")
                     .tag(SidebarItem.finder)
+                Label(model.t.finderPathSection, systemImage: "terminal")
+                    .tag(SidebarItem.finderPath)
             }
 
             Section(model.t.startupSection) {

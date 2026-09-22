@@ -19,6 +19,8 @@ final class AppModel {
     var middleClickEnabled: Bool = true
     var middleClickStatus: String?
     var finderSyncEnabled: Bool = FinderSyncSettings.isMenuEnabled()
+    var finderOpenTerminalEnabled: Bool = FinderSyncSettings.isOpenTerminalEnabled()
+    var finderCopyPathEnabled: Bool = FinderSyncSettings.isCopyPathEnabled()
     var finderExtensionEnabledInSystem: Bool = false
     var language: AppLanguage = .system
     var openAtLogin: Bool = true
@@ -96,6 +98,12 @@ final class AppModel {
 
     func persistFinderSync() {
         FinderSyncSettings.setMenuEnabled(finderSyncEnabled)
+        FinderSyncSettings.setLanguage(language)
+    }
+
+    func persistFinderFolderActions() {
+        FinderSyncSettings.setOpenTerminalEnabled(finderOpenTerminalEnabled)
+        FinderSyncSettings.setCopyPathEnabled(finderCopyPathEnabled)
         FinderSyncSettings.setLanguage(language)
     }
 
